@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node circle {
+  fill: #999;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.node--internal circle {
+  fill: #555;
+}
+
+.node--internal text {
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #555;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
+}
+
+svg{
+  cursor: all-scroll;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v4.0.0-alpha.29.js"></script>
+<script src="https://d3js.org/d3-hierarchy.v1.min.js"></script>
+<script src="https://d3js.org/d3-selection.v1.min.js"></script>
+<script src="https://d3js.org/d3-zoom.v1.min.js"></script>
+<script src="https://d3js.org/d3-drag.v1.min.js"></script>
+<script src="https://d3js.org/d3-transition.v1.min.js"></script>
+<script src="burrow.js"></script>
+<script>
+var height = 100000,
+  width = 5000
+
+
+
+  // var drag = d3.drag().on("start", dragged)
+  //
+  //   function dragged(){
+  //     console.log("Dragging")
+  //   }
+
+
+  zoom = d3.zoom()
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+      .attr("transform", "translate(100, 100)")
+      //.call(zoom)
+      // .call(drag)
+
+  var rect = svg.append("rect")
+      .attr("width", width)
+      .attr("height", height)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+
+
+  var container = svg.append("g");
+
+
+
+  // function zoomed() {
+  //   container.attr("transform", d3.event.transform);
+  // }
+
+d3.text("expanded.csv", function(err, text){
+  if (err) throw err;
+  rows = d3.csvParseRows(text) //parse the text dump
+  data = new Array()
+  rows.forEach(function(row) {
+    //construct a new row with a taxonomy property
+    newRow = {}
+    taxonomy = row.clean("") // get rid of empty strings;
+    newRow.taxonomy = new Array()
+    //strip whitespace out of the taxonomy entries
+    for (var i=0; i< taxonomy.length; i++){
+      newRow.taxonomy[i] = taxonomy[i].replace(/ /g,'');
+    }
+    newRow.nodeName = newRow.taxonomy[newRow.taxonomy.length - 1]
+    data.push(newRow)
+  });
+
+  root = d3.hierarchy(burrow(data)); // make a hierarchy out of the flat data
+
+  root.children.reverse()
+
+  cluster = d3.tree()
+    .size([height-250, width-160])
+
+  cluster(root)
+
+  textScale = d3.scaleLinear()
+    .domain(d3.extent(root.descendants(), function(d){return d.depth}))
+    .range([10, 5])
+
+
+  var link = container.selectAll(".link")
+    .data(root.descendants().slice(1))
+  .enter().append("path")
+    .attr("class", "link")
+    .attr('stroke-width', 1)
+    .attr("d", function(d) {
+      d._element = this
+      return "M" + d.y + "," + d.x
+          + "C" + (d.parent.y + 100) + "," + d.x
+          + " " + (d.parent.y + 100) + "," + d.parent.x
+          + " " + d.parent.y + "," + d.parent.x;
+    });
+
+    var node = container.selectAll(".node")
+        .data(root.descendants())
+      .enter().append("g")
+        .attr('element', function(d){
+          d._element = this
+          return this
+        })
+        .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
+        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+
+    node.append("circle")
+        .attr("r", 1.5);
+
+    node.append("text")
+        .attr("dy", 3)
+        .attr("x", function(d) { return d.children ? -8 : 8; })
+        .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+        .style('font-size', function(d){
+          d._fontSize = textScale(d.depth)
+          return textScale(d.depth)
+        })
+        .text(function(d) { return d.data.name});
+
+    node.on('click', function(d){
+      // console.log(this)
+      // console.log(d)
+    })
+
+    node.on('mouseover', function(d){
+      _this = d3.select(this)
+      _this.selectAll("text")
+        .style('fill', '#0066cc')
+        .style('font-size', 20)
+      _this.style('cusor', 'pointer')
+      _this.moveToFront()
+      d.eachAfter(function(after){
+        _after = d3.select(after._element)
+        _after.selectAll("text")
+          .style('fill', function(d){
+            if(_after.classed('node--leaf')){
+              return 'steelblue'
+            }else{
+              return '#0066cc'
+            }
+          })
+          .style('font-size', function(d){
+            if (_after.classed('node--leaf')){
+              return _after._fontSize
+            }else{
+                return _after.fontSize * 1.5
+            }
+          })
+      })
+    })
+
+    node.on('mouseout', function(d){
+      _this = d3.select(this)
+      _this.selectAll('text')
+        .style('fill', 'black')
+        .style('font-size', function(d){
+          return d._fontSize
+        })
+        _this.style('cusor', 'all-scroll')
+        d.eachAfter(function(after){
+          _after = d3.select(after._element)
+          _after.selectAll("text").style('fill', 'black')
+            .style('font-size', function(d){return d._fontSize})
+
+        })
+    })
+})
+
+
+d3.selection.prototype.moveToBack = function() {
+    return this.each(function() {
+        var firstChild = this.parentNode.firstChild;
+        if (firstChild) {
+            this.parentNode.insertBefore(this, firstChild);
+        }
+    });
+};
+
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+</script>
+</body>
+</html>

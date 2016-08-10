@@ -1,0 +1,16 @@
+{
+  "name": "neotoma-taxonomy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "dependencies":{
+    "flat-to-nested" : "latest",
+    "request" : "latest",
+    "fs" : "latest"
+  },
+  "author": "Scott Farley",
+  "license": "ISC"
+}
