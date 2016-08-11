@@ -4,7 +4,7 @@ url = "http://api.neotomadb.org/v1/dbtables/taxa?limit=50000&taxagroupid=vpl&sor
 json = requests.get(url).json()
 taxa = json['data']
 import csv
-fout = open("/Users/scottsfarley/documents/neotomataxonomy/expanded_extra.csv", 'w')
+fout = open("/Users/scottsfarley/documents/neotomataxonomy/expanded_extra_2.csv", 'w')
 writer = csv.writer(fout, lineterminator="\n")
 
 stops = ['Bacteria', 'Archaea', 'Protozoa', 'Chromista', 'Plantae', 'Fungi', 'Animalia', 'Algae']
@@ -16,10 +16,11 @@ def getTaxonInfo(taxonID, tax):
     for item in taxa:
         if item['TaxonID'] == taxonID:
             thisTaxon = item
-    tax.append( thisTaxon['TaxonName'].encode("utf8"))
-    if thisTaxon is None or thisTaxon['TaxonName'] in stops:
+    tax.append(thisTaxon['TaxonName'].encode("utf8"))
+    if thisTaxon['TaxonName'] in stops:
         return tax
-    elif thisTaxon['TaxonID'] in stopIDs or thisTaxon['TaxaGroupID'] == 'LAB':
+    elif thisTaxon['TaxonID'] in stopIDs or thisTaxon['TaxaGroupID'] == 'LAB' or thisTaxon is None:
+        tax.append("Other")
         return tax
     else:
         getTaxonInfo(thisTaxon['HigherTaxonID'], tax)
@@ -37,7 +38,6 @@ def getTaxonomy(taxonID):
 
 total = len(taxa)
 i = 0
-writer.writerow(["id", "value"])
 for taxon in taxa:
     print i, total
     i += 1
@@ -53,3 +53,4 @@ for taxon in taxa:
     taxonomy.insert(0, taxon['Extinct'])
     taxonomy.insert(0, thisTaxonID)
     writer.writerow(taxonomy)
+    print taxonomy

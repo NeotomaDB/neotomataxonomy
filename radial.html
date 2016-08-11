@@ -79,173 +79,69 @@
 <script src="https://d3js.org/d3-transition.v1.min.js"></script>
 <script src="burrow.js"></script>
 <script>
-var height = 100000,
+var height = 10000,
   width = 5000
 
-
-
-  // var drag = d3.drag().on("start", dragged)
-  //
-  //   function dragged(){
-  //     console.log("Dragging")
-  //   }
-
-
-  zoom = d3.zoom()
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
       .attr("transform", "translate(100, 100)")
-      //.call(zoom)
-      // .call(drag)
-
-  var rect = svg.append("rect")
-      .attr("width", width)
-      .attr("height", height)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-
-
-  var container = svg.append("g");
-
-
-
-  // function zoomed() {
-  //   container.attr("transform", d3.event.transform);
-  // }
-
-d3.text("expanded_with_num_sites.csv", function(err, text){
+  g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + (height / 2 + 20) + ")");
+d3.text("expanded.csv", function(err, text){
   if (err) throw err;
   rows = d3.csvParseRows(text) //parse the text dump
-  data = new Array()
   data = new Array()
   rows.forEach(function(row) {
     //construct a new row with a taxonomy property
     newRow = {}
-    taxonomy = row.slice(4, row.length) // skips the extra info
-    taxonomy = taxonomy.clean("") // get rid of empty strings;
+    taxonomy = row.clean("") // get rid of empty strings;
     newRow.taxonomy = new Array()
     //strip whitespace out of the taxonomy entries
     for (var i=0; i< taxonomy.length; i++){
-      newRow.taxonomy[i] = taxonomy[i].replace(/\s+$/, '');
+      newRow.taxonomy[i] = taxonomy[i].replace(/ /g,'');
     }
-    newRow.author = row[2]
-    newRow.extinct = row[1]
-    newRow.id = row[0]
-    newRow.numSites = parseInt(row[3])
     newRow.nodeName = newRow.taxonomy[newRow.taxonomy.length - 1]
     data.push(newRow)
-  }); //end foreach
+  });
 
   root = d3.hierarchy(burrow(data)); // make a hierarchy out of the flat data
 
   root.children.reverse()
 
-  cluster = d3.tree()
-    .size([height-250, width-160])
+  cluster = d3.cluster()
+    .size([height, width / 2 - 120]);
 
   cluster(root)
 
-  textScale = d3.scaleLinear()
-    .domain(d3.extent(root.descendants(), function(d){return d.depth}))
-    .range([10, 5])
 
+    var link = g.selectAll(".link")
+        .data(root.descendants().slice(1))
+      .enter().append("path")
+        .attr("class", "link")
+        .attr("d", function(d) {
+          return "M" + project(d.x, d.y)
+              + "C" + project(d.x, (d.y + d.parent.y) / 2)
+              + " " + project(d.parent.x, (d.y + d.parent.y) / 2)
+              + " " + project(d.parent.x, d.parent.y);
+        });
 
-  var link = container.selectAll(".link")
-    .data(root.descendants().slice(1))
-  .enter().append("path")
-    .attr("class", "link")
-    .attr('stroke-width', 1)
-    .attr('element', function(d){
-      d._element = this
-      return this
-    })
-    .attr("d", function(d) {
-      return "M" + d.y + "," + d.x
-          + "C" + (d.parent.y + 100) + "," + d.x
-          + " " + (d.parent.y + 100) + "," + d.parent.x
-          + " " + d.parent.y + "," + d.parent.x;
-    });
-
-
-    var node = container.selectAll(".node")
+    var node = g.selectAll(".node")
         .data(root.descendants())
       .enter().append("g")
-        .attr('element', function(d){
-          d._element = this
-          return this
-        })
         .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+        .attr("transform", function(d) { return "translate(" + project(d.x, d.y) + ")"; });
 
     node.append("circle")
-        .attr("r", 1.5);
+        .attr("r", 2.5);
 
     node.append("text")
-        .attr("dy", 3)
-        .attr("x", function(d) { return d.children ? -8 : 8; })
-        .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-        .style('font-size', function(d){
-          d._fontSize = textScale(d.depth)
-          return textScale(d.depth)
-        })
+        .attr("dy", "0.31em")
+        .attr("x", function(d) { return d.x < 180 === !d.children ? 6 : -6; })
+        .style("text-anchor", function(d) { return d.x < 180 === !d.children ? "start" : "end"; })
+        .attr("transform", function(d) { return "rotate(" + (d.x < 180 ? d.x - 90 : d.x + 90) + ")"; })
         .text(function(d) { return d.data.name});
-
-    node.on('click', function(d){
-      // console.log(this)
-      // console.log(d)
-    })
-
-    node.on('mouseover', function(d){
-      _this = d3.select(this)
-      _this.selectAll("text")
-        .style('fill', '#0066cc')
-        .style('font-size', 20)
-      _this.style('cusor', 'pointer')
-      _this.moveToFront()
-      d.eachAfter(function(after){
-        _after = d3.select(after._element)
-        _after.selectAll("text")
-          .style('fill', function(d){
-            if(_after.classed('node--leaf')){
-              return 'steelblue'
-            }else{
-              return '#0066cc'
-            }
-          })//end style fill
-          // links = after.links()
-          // console.log(links)
-          // for(var i = 0; i<links.length;i++){
-          //   console.log()
-          //   _link = links[i]._element
-          //   _link.style('stroke', '#0066cc')
-          // }
-          // .style('font-size', function(d){
-          //   if (_after.classed('node--leaf')){
-          //     return _after._fontSize
-          //   }else{
-          //       return _after.fontSize * 1.5
-          //   }
-          // })//end font size
-      })
-    })
-
-    node.on('mouseout', function(d){
-      _this = d3.select(this)
-      _this.selectAll('text')
-        .style('fill', 'black')
-        .style('font-size', function(d){
-          return d._fontSize
-        })
-        _this.style('cusor', 'all-scroll')
-        d.eachAfter(function(after){
-          _after = d3.select(after._element)
-          _after.selectAll("text").style('fill', 'black')
-            .style('font-size', function(d){return d._fontSize})
-        })
-    })
 })
 
 
@@ -264,6 +160,10 @@ d3.selection.prototype.moveToFront = function() {
   });
 };
 
+function project(x, y) {
+  var angle = (x - 90) / 180 * Math.PI, radius = y;
+  return [radius * Math.cos(angle), radius * Math.sin(angle)];
+}
 </script>
 </body>
 </html>
