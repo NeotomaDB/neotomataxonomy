@@ -108,8 +108,8 @@
 
     <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="//d3js.org/d3.v3.min.js"></script>
-  <script src="burrow.js"></script>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="lib/burrow.js"></script>
   <script src="https://d3js.org/d3-hierarchy.v1.min.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script>
@@ -150,7 +150,7 @@ function loadAndDraw(){
   }
   nonExtinctOnly = false;
 
-  d3.text("expanded_with_num_sites.csv", function(error, dump) {
+  d3.text("data/expanded_with_num_sites.csv", function(error, dump) {
     //filter the data
     if (error) throw error;
     rows = d3.csv.parseRows(dump)
