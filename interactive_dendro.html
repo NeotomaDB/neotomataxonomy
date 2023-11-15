@@ -354,13 +354,13 @@ function divShow(d){
         div.html("Loading...")
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY + 15) + "px");
-      $.getJSON("http://api.neotomadb.org/v1/data/taxa?taxonname=" + d.data.name, function(data){
+      $.getJSON("https://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
         if (data['success']){
           try{
             html = "<h5 class='page-header'>" + data['data'][0]['TaxonName'] + "</h4>"
-            html += "<strong>Taxon ID: </strong>" + "<span class='text-muted'>" + data['data'][0]['TaxonID'] + "</span><br / />"
-            html += "<strong>Extinct: </strong>" + "<span class='text-muted'>" + data['data'][0]['Extinct']  + "</span><br / />"
-            html += "<strong>Author: </strong>" + "<span class='text-muted'>" + data['data'][0]['Author']  + "</span><br / />"
+            html += "<strong>Neotoma Taxon ID: </strong>" + "<span class='text-muted'>" + data['data'][0]['taxonid'] + "</span><br / />"
+            html += "<strong>Status: </strong>" + "<span class='text-muted'>" + data['data'][0]['status']  + "</span><br / />"
+            html += "<strong>Author: </strong>" + "<span class='text-muted'>" + data['data'][0]['author']  + "</span><br / />"
             div.html(html)
           }catch(err){
             div.html("No Details Found")
@@ -377,12 +377,12 @@ function divHide(d){
 function dblclick(d){
   $("#myModal").modal('show');
   $("#myModalLabel").text(d.data.name)
-  $.getJSON("http://api.neotomadb.org/v1/data/taxa?taxonname=" + d.data.name, function(data){
+  $.getJSON("http://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
     if (data['success']){
       try{
-        $("#taxonIDModal").text(data['data'][0]['TaxonID'])
-        $("#exinctModal").text(data['data'][0]['Extinct'])
-        $("#authorModal").text(data['data'][0]['Author'])
+        $("#taxonIDModal").text(data['data'][0]['taxonid'])
+        $("#exinctModal").text(data['data'][0]['status'])
+        $("#authorModal").text(data['data'][0]['author'])
       }catch(err){
         console.log(err)
       }
