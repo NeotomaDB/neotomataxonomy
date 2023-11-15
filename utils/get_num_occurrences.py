@@ -1,13 +1,14 @@
 __author__ = 'scottsfarley'
-f = open("expanded_extra_2.csv", 'rU')
 import csv
 import requests
+
+f = open("./data/expanded_extra_2.csv", 'r')
 reader = csv.reader(f)
-fout = open("expanded_with_num_sites.csv", 'w')
+fout = open("./data/expanded_with_num_sites.csv", 'w')
 writer = csv.writer(fout, lineterminator="\n")
-i= 0
+i=0
 for row in reader:
-    endpoint = "http://apidev.neotomadb.org/v1/data/occurrences?nametype=base&taxonids=" + str(row[0])
+    endpoint = "http://api.neotomadb.org/v2.0/data/occurrences?taxonid=" + str(row[0])
     r = requests.get(endpoint)
     j = r.json()
     data = j['data']
@@ -16,4 +17,4 @@ for row in reader:
     writer.writerow(row)
     i += 1
     if i % 100 == 0:
-        print i
+        print(i)

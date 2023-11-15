@@ -1,56 +1,73 @@
 __author__ = 'scottsfarley'
-import requests
-url = "http://api.neotomadb.org/v1/dbtables/taxa?limit=50000&taxagroupid=vpl&sort=taxonname"
-json = requests.get(url).json()
-taxa = json['data']
+
 import csv
-fout = open("/Users/scottsfarley/documents/neotomataxonomy/expanded_extra_2.csv", 'w')
+import requests
+
+# Call the Neotoma API:
+url = "http://api.neotomadb.org/v2.0/data/taxa?limit=50000&taxagroupid=vpl"
+json = requests.get(url, timeout = 2000).json()
+taxa = json['data']
+
+# Set up the output file:
+fout = open("./data/expanded_extra_2.csv", 'w')
 writer = csv.writer(fout, lineterminator="\n")
 
+# Define the root variables we're interested in.
 stops = ['Bacteria', 'Archaea', 'Protozoa', 'Chromista', 'Plantae', 'Fungi', 'Animalia', 'Algae']
 stopIDs = [30, 63, 1414]
-tree = {}
 
-def getTaxonInfo(taxonID, tax):
-    thisTaxon = None
-    for item in taxa:
-        if item['TaxonID'] == taxonID:
-            thisTaxon = item
-    tax.append(thisTaxon['TaxonName'].encode("utf8"))
-    if thisTaxon['TaxonName'] in stops:
-        return tax
-    elif thisTaxon['TaxonID'] in stopIDs or thisTaxon['TaxaGroupID'] == 'LAB' or thisTaxon is None:
+
+def getTaxonInfo(taxonid, tax):
+    """_Create the recursive taxon path for an individual taxon._
+
+    Args:
+        taxonid (_integer_): _The (Neotoma) taxon ID for a particular taxon_
+        tax (_list_): _A list of taxonnames for the node path a particular taxon takes to the root._
+
+    Returns:
+        _list_: _A set of taxonomic names relating the focal taxon to the root of the tree._
+    """
+    # Use a generator expression to return the right object:
+    target = next((item for item in taxa if item.get("taxonid") == taxonid), None)
+    if target is None:
         tax.append("Other")
         return tax
+    elif target['taxonname'] in stops:
+        tax.append(target['taxonname'].encode("utf8"))
+        return tax
+    elif target['taxonid'] in stopIDs or target['highertaxonid'] is None or target['highertaxonid'] == taxonid:
+        return tax
     else:
-        getTaxonInfo(thisTaxon['HigherTaxonID'], tax)
-        return tax
+        tax.append(target['taxonname'].encode("utf8"))
+        return getTaxonInfo(target['highertaxonid'], tax)
 
+def getTaxonCount(taxonid):
+    """_summary_
 
-def getTaxonomy(taxonID):
-    try:
-        tax = []
-        tax = getTaxonInfo(taxonID, tax)
-        return tax
-    except Exception as e:
-        print str(e)
-        return []
+    Args:
+        taxonid (_type_): _description_
+    """
+    endpoint = f"http://api.neotomadb.org/v2.0/data/sites?taxa={taxonid}&limit=99999"
+    json = requests.get(endpoint, timeout = 2000).json()
+    return len(json.get('data'))
 
 total = len(taxa)
 i = 0
+
 for taxon in taxa:
-    print i, total
+    print(i, total)
     i += 1
-    thisTaxonID = taxon['TaxonID']
-    taxonomy = getTaxonomy(thisTaxonID)
+    thistaxonid = taxon['taxonid']
+    taxonomy = getTaxonInfo(thistaxonid, [])
     taxonomy.reverse()
-    author = taxon['Author']
+    author = taxon['author']
     try:
         author = author.encode('utf8')
-    except:
+    except Exception as e:
         author = "unknown"
+    taxonomy.insert(0, getTaxonCount(taxon['taxonid']))
     taxonomy.insert(0, author)
-    taxonomy.insert(0, taxon['Extinct'])
-    taxonomy.insert(0, thisTaxonID)
+    taxonomy.insert(0, taxon['status'] == 'extinct')
+    taxonomy.insert(0, thistaxonid)
     writer.writerow(taxonomy)
-    print taxonomy
+
