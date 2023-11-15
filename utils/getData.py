@@ -1,17 +1,18 @@
-import requests
 import csv
-allData = requests.get("http://api.neotomadb.org/v1/dbtables/taxa?limit=50000&fields=taxonname,taxonid,highertaxonid").json()
-fout = open("/Users/scottsfarley/documents/neotomataxonomy/short.csv", 'w')
+import requests
+
+allData = requests.get("https://api.neotomadb.org/v2.0/data/dbtables/taxa?limit=500000").json()
+fout = open("./data/short.csv", 'w')
 writer = csv.DictWriter(fout, fieldnames=['Parent', 'Id', 'Name'], lineterminator="\n")
 taxa = allData['data']
 newData = []
 for item in taxa:
     newItem = {
-        'Parent': item['HigherTaxonID'],
-        'Id' : item['TaxonID'],
-        'Name' : item['TaxonName'].encode("utf8")
+        'Parent': item['highertaxonid'],
+        'Id' : item['taxonid'],
+        'Name' : item['taxonname'].encode("utf8")
     }
     try:
         writer.writerow(newItem)
-    except:
-        pass
+    except Exception as e:
+        print(e)
