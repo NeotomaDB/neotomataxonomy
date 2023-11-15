@@ -355,7 +355,7 @@ function divShow(d){
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY + 15) + "px");
       $.getJSON("https://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
-        if (data['success']){
+        if (data["status"] === "success"){
           try{
             html = "<h5 class='page-header'>" + data['data'][0]['TaxonName'] + "</h4>"
             html += "<strong>Neotoma Taxon ID: </strong>" + "<span class='text-muted'>" + data['data'][0]['taxonid'] + "</span><br / />"
@@ -378,7 +378,7 @@ function dblclick(d){
   $("#myModal").modal('show');
   $("#myModalLabel").text(d.data.name)
   $.getJSON("https://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
-    if (data['success']){
+    if (data['status']==="success"){
       try{
         $("#taxonIDModal").text(data['data'][0]['taxonid'])
         $("#exinctModal").text(data['data'][0]['status'])
