@@ -111,7 +111,7 @@
   <script src="https://d3js.org/d3.v3.min.js"></script>
   <script src="lib/burrow.js"></script>
   <script src="https://d3js.org/d3-hierarchy.v1.min.js"></script>
-  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script>
 globals = {}
 var margin = {top: 100, right: 120, bottom: 20, left: 120},
@@ -377,7 +377,7 @@ function divHide(d){
 function dblclick(d){
   $("#myModal").modal('show');
   $("#myModalLabel").text(d.data.name)
-  $.getJSON("http://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
+  $.getJSON("https://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
     if (data['success']){
       try{
         $("#taxonIDModal").text(data['data'][0]['taxonid'])
