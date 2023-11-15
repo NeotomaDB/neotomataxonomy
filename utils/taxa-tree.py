@@ -1,9 +1,11 @@
 __author__ = 'scottsfarley'
 import requests
+import csv
+
 url = "http://api.neotomadb.org/v1/dbtables/taxa?limit=50000&taxagroupid=vpl&sort=taxonname"
 json = requests.get(url).json()
 taxa = json['data']
-import csv
+
 fout = open("/Users/scottsfarley/documents/neotomataxonomy/flat.tsv", 'w')
 writer = csv.writer(fout, lineterminator="\n")
 stops = ['Bacteria', 'Archaea', 'Protozoa', 'Chromista', 'Plantae', 'Fungi', 'Animalia', 'Algae']
