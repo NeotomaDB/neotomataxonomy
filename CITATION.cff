@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Farley"
+  given-names: "Scott"
+  orcid: "https://orcid.org/0000-0003-1952-3883"
+- family-names: "Goring"
+  given-names: "Simon"
+  orcid: "https://orcid.org/0000-0002-2700-4605"
+title: "Neotoma Paleoecology Database Taxonomy Viewer"
+version: 1.0
+doi: 10.5281/zenodo.10139967
+date-released: 2023-11-15
+url: "https://github.com/NeotomaDB/neotomataxonomy"
