@@ -2,6 +2,8 @@
 
 [![NSF-1550707](https://img.shields.io/badge/NSF-1550707-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1550707) [![NSF-1541002](https://img.shields.io/badge/NSF-1541002-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541002)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10139967.svg)](https://doi.org/10.5281/zenodo.10139967)
+
 # Neotoma Taxonomy Viewer
 
 This repository is intended to act as a graphical viewer for the Neotoma Paleoecology Database's taxonomy table. The basis of this repository is work by [Scott Farley](https://www.scottsfarley.com/) who built a set of three linked visualizations for Neotoma's taxa, served using [D3.js](https://d3js.org/) visualizations through HTML webpages.
