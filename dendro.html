@@ -116,7 +116,7 @@ var svg = d3.select("body").append("svg")
   //   container.attr("transform", d3.event.transform);
   // }
 
-d3.text("data/expanded_with_num_sites.csv", function(err, text){
+d3.text("data/expanded_taxa.csv", function(err, text){
   if (err) throw err;
   rows = d3.csvParseRows(text) //parse the text dump
   data = new Array()

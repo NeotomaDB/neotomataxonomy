@@ -150,7 +150,7 @@ function loadAndDraw(){
   }
   nonExtinctOnly = false;
 
-  d3.text("data/expanded_with_num_sites.csv", function(error, dump) {
+  d3.text("data/expanded_taxa.csv", function(error, dump) {
     //filter the data
     if (error) throw error;
     rows = d3.csv.parseRows(dump)
@@ -357,7 +357,7 @@ function divShow(d){
       $.getJSON("https://api.neotomadb.org/v2.0/data/taxa?taxonname=" + d.data.name, function(data){
         if (data["status"] === "success"){
           try{
-            html = "<h5 class='page-header'>" + data['data'][0]['TaxonName'] + "</h4>"
+            html = "<h5 class='page-header'>" + data['data'][0]['taxonname'] + "</h4>"
             html += "<strong>Neotoma Taxon ID: </strong>" + "<span class='text-muted'>" + data['data'][0]['taxonid'] + "</span><br / />"
             html += "<strong>Status: </strong>" + "<span class='text-muted'>" + data['data'][0]['status']  + "</span><br / />"
             html += "<strong>Author: </strong>" + "<span class='text-muted'>" + data['data'][0]['author']  + "</span><br / />"
