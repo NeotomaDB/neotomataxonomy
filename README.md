@@ -1,8 +1,12 @@
 ![](taxonomy_viewer_banner.png)
 
-[![NSF-1550707](https://img.shields.io/badge/NSF-1550707-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1550707) [![NSF-1541002](https://img.shields.io/badge/NSF-1541002-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541002)
+<!-- badges: start -->
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10139967.svg)](https://doi.org/10.5281/zenodo.10139967)
+
+
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable) [![NSF-1550707](https://img.shields.io/badge/NSF-1550707-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1550707) [![NSF-1541002](https://img.shields.io/badge/NSF-1541002-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541002) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10139967.svg)](https://doi.org/10.5281/zenodo.10139967)
+
+<!-- badges: end -->
 
 # Neotoma Taxonomy Viewer
 
